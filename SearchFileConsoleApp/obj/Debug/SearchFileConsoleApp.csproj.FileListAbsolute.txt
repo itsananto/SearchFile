@@ -1,0 +1,7 @@
+C:\Users\Ananto\source\repos\SearchFile\SearchFileConsoleApp\bin\Debug\SearchFileConsoleApp.exe.config
+C:\Users\Ananto\source\repos\SearchFile\SearchFileConsoleApp\bin\Debug\SearchFileConsoleApp.exe
+C:\Users\Ananto\source\repos\SearchFile\SearchFileConsoleApp\bin\Debug\SearchFileConsoleApp.pdb
+C:\Users\Ananto\source\repos\SearchFile\SearchFileConsoleApp\obj\Debug\SearchFileConsoleApp.csprojAssemblyReference.cache
+C:\Users\Ananto\source\repos\SearchFile\SearchFileConsoleApp\obj\Debug\SearchFileConsoleApp.csproj.CoreCompileInputs.cache
+C:\Users\Ananto\source\repos\SearchFile\SearchFileConsoleApp\obj\Debug\SearchFileConsoleApp.exe
+C:\Users\Ananto\source\repos\SearchFile\SearchFileConsoleApp\obj\Debug\SearchFileConsoleApp.pdb

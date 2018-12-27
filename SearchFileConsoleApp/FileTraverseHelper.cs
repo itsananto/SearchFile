@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
+using System.Security.Permissions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,12 +22,12 @@ namespace SearchFileConsoleApp
             .CreateLogger();
         }
 
-        public static void TraverseTree(string root)
+        public StringCollection TraverseTree(string root)
         {
-            StringCollection FileCollection = new StringCollection();
+            StringCollection fileCollection = new StringCollection();
             Stack<string> dirs = new Stack<string>(20);
 
-            if (!System.IO.Directory.Exists(root))
+            if (!Directory.Exists(root))
             {
                 throw new ArgumentException();
             }
@@ -37,44 +39,35 @@ namespace SearchFileConsoleApp
                 string[] subDirs;
                 try
                 {
-                    subDirs = System.IO.Directory.GetDirectories(currentDir);
+                    subDirs = Directory.GetDirectories(currentDir);
                 }
-                // An UnauthorizedAccessException exception will be thrown if we do not have
-                // discovery permission on a folder or file. It may or may not be acceptable 
-                // to ignore the exception and continue enumerating the remaining files and 
-                // folders. It is also possible (but unlikely) that a DirectoryNotFound exception 
-                // will be raised. This will happen if currentDir has been deleted by
-                // another application or thread after our call to Directory.Exists. The 
-                // choice of which exceptions to catch depends entirely on the specific task 
-                // you are intending to perform and also on how much you know with certainty 
-                // about the systems on which this code will run.
                 catch (UnauthorizedAccessException e)
                 {
-                    // Console.WriteLine(e.Message);
+                    Log.Error(e.Message);
                     continue;
                 }
-                catch (System.IO.DirectoryNotFoundException e)
+                catch (DirectoryNotFoundException e)
                 {
-                    // Console.WriteLine(e.Message);
+                    Log.Error(e.Message);
                     continue;
                 }
 
                 string[] files = null;
                 try
                 {
-                    files = System.IO.Directory.GetFiles(currentDir);
+                    files = Directory.GetFiles(currentDir);
                 }
 
                 catch (UnauthorizedAccessException e)
                 {
 
-                    // Console.WriteLine(e.Message);
+                    Log.Error(e.Message);
                     continue;
                 }
 
-                catch (System.IO.DirectoryNotFoundException e)
+                catch (DirectoryNotFoundException e)
                 {
-                    // Console.WriteLine(e.Message);
+                    Log.Error(e.Message);
                     continue;
                 }
                 // Perform the required action on each file here.
@@ -83,24 +76,17 @@ namespace SearchFileConsoleApp
                 {
                     try
                     {
-                        System.IO.FileInfo fi = new System.IO.FileInfo(file);
-                        //Console.WriteLine("{0}: {1}, {2}", fi.Name, fi.Length, fi.CreationTime);
-                        FileCollection.Add(fi.Name);
+                        FileInfo fi = new FileInfo(file);
+                        fileCollection.Add(fi.Name);
                     }
-                    catch (System.IO.FileNotFoundException e)
+                    catch (FileNotFoundException e)
                     {
-                        // If file was deleted by a separate application
-                        //  or thread since the call to TraverseTree()
-                        // then just continue.
-                        // Console.WriteLine(e.Message);
+                        Log.Error(e.Message);
                         continue;
                     }
                     catch (Exception e)
                     {
-                        // If file was deleted by a separate application
-                        //  or thread since the call to TraverseTree()
-                        // then just continue.
-                        // Console.WriteLine(e.Message);
+                        Log.Error(e.Message);
                         continue;
                     }
                 }
@@ -110,6 +96,50 @@ namespace SearchFileConsoleApp
                     dirs.Push(str);
                 }
             }
+
+            return fileCollection;
+        }
+
+        [PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
+        public void AddWatcher(string root)
+        {
+            FileSystemWatcher watcher = new FileSystemWatcher()
+            {
+                Path = root,
+                IncludeSubdirectories = true,
+                Filter = "*.*",
+                NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName
+            };
+
+            // Add event handlers.
+            watcher.Changed += new FileSystemEventHandler(OnCreated);
+            watcher.Created += new FileSystemEventHandler(OnChanged);
+            watcher.Deleted += new FileSystemEventHandler(OnDeleted);
+            watcher.Renamed += new RenamedEventHandler(OnRenamed);
+
+            // Begin watching.
+            watcher.EnableRaisingEvents = true;
+        }
+
+        // Define the event handlers.
+        private static void OnCreated(object source, FileSystemEventArgs e)
+        {
+            Console.WriteLine("File Created: " + e.FullPath + " " + e.ChangeType);
+        }
+
+        private static void OnChanged(object source, FileSystemEventArgs e)
+        {
+            Console.WriteLine("File: Changed" + e.FullPath + " " + e.ChangeType);
+        }
+
+        private static void OnDeleted(object source, FileSystemEventArgs e)
+        {
+            Console.WriteLine("File: Deleted" + e.FullPath + " " + e.ChangeType);
+        }
+
+        private static void OnRenamed(object source, RenamedEventArgs e)
+        {
+            Console.WriteLine("File: {0} renamed to {1}", e.OldFullPath, e.FullPath);
         }
     }
 }

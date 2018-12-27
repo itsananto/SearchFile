@@ -25,7 +25,7 @@ namespace SearchFileConsoleApp
 
             String tableCommand = "CREATE TABLE IF NOT " +
                 "EXISTS File_Archive (Primary_Key INTEGER PRIMARY KEY, " +
-                "Text_Entry NVARCHAR(2048) NULL)";
+                "File_Name NVARCHAR(2048) NULL)";
 
             SQLiteCommand createTable = new SQLiteCommand(tableCommand, db);
 
@@ -67,29 +67,39 @@ namespace SearchFileConsoleApp
             db.Close();
         }
 
+        public void InsertSearchHistoryTable()
+        {
+            db.Open();
+
+            SQLiteCommand insertCommand = new SQLiteCommand();
+            insertCommand.Connection = db;
+
+            using (var transaction = db.BeginTransaction())
+            {
+                insertCommand.CommandText = "INSERT INTO Search_History VALUES (NULL, @Entry);";
+                insertCommand.Parameters.AddWithValue("@Entry", DateTime.Now.Ticks);
+
+                insertCommand.ExecuteNonQuery();
+                transaction.Commit();
+            }
+
+            db.Close();
+        }
+
         public bool IfHistoryExists()
         {
             db.Open();
 
-            String tableCommand = "CREATE TABLE IF NOT " +
-                "EXISTS File_Archive (Primary_Key INTEGER PRIMARY KEY, " +
-                "Text_Entry NVARCHAR(2048) NULL)";
+            String tableCommand = "SELECT Time FROM Search_History";
 
             SQLiteCommand createTable = new SQLiteCommand(tableCommand, db);
 
-            createTable.ExecuteReader();
+            var reader = createTable.ExecuteReader();
+            bool hasRows = reader.HasRows;
 
-
-            tableCommand = "CREATE TABLE IF NOT " +
-                "EXISTS Search_History (Primary_Key INTEGER PRIMARY KEY, " +
-                "Time INTEGER NOT NULL)";
-
-            createTable = new SQLiteCommand(tableCommand, db);
-
-            createTable.ExecuteReader();
             db.Close();
 
-            return true;
+            return hasRows;
         }
     }
 }

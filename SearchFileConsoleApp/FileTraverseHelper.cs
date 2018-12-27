@@ -107,13 +107,12 @@ namespace SearchFileConsoleApp
             {
                 Path = root,
                 IncludeSubdirectories = true,
-                Filter = "*.*",
-                NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName
+                Filter = "*.*"
             };
 
             // Add event handlers.
-            watcher.Changed += new FileSystemEventHandler(OnCreated);
-            watcher.Created += new FileSystemEventHandler(OnChanged);
+            watcher.Changed += new FileSystemEventHandler(OnChanged);
+            watcher.Created += new FileSystemEventHandler(OnCreated);
             watcher.Deleted += new FileSystemEventHandler(OnDeleted);
             watcher.Renamed += new RenamedEventHandler(OnRenamed);
 
@@ -129,12 +128,12 @@ namespace SearchFileConsoleApp
 
         private static void OnChanged(object source, FileSystemEventArgs e)
         {
-            Console.WriteLine("File: Changed" + e.FullPath + " " + e.ChangeType);
+            Console.WriteLine("File Changed: " + e.FullPath + " " + e.ChangeType);
         }
 
         private static void OnDeleted(object source, FileSystemEventArgs e)
         {
-            Console.WriteLine("File: Deleted" + e.FullPath + " " + e.ChangeType);
+            Console.WriteLine("File Deleted: " + e.FullPath + " " + e.ChangeType);
         }
 
         private static void OnRenamed(object source, RenamedEventArgs e)

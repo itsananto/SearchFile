@@ -20,3 +20,5 @@ SearchFileConsoleApp/bin/Debug/EntityFramework.dll
 SearchFileConsoleApp/bin/Debug/EntityFramework.SqlServer.xml
 SearchFileConsoleApp/bin/Debug/EntityFramework.SqlServer.dll
 SearchFileConsoleApp/obj/Debug/SearchFileConsoleApp.csproj.CopyComplete
+SearchFileConsoleApp/bin/
+SearchFileConsoleApp/obj/

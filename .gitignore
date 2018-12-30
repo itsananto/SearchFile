@@ -22,3 +22,6 @@ SearchFileConsoleApp/bin/Debug/EntityFramework.SqlServer.dll
 SearchFileConsoleApp/obj/Debug/SearchFileConsoleApp.csproj.CopyComplete
 SearchFileConsoleApp/bin/
 SearchFileConsoleApp/obj/
+SearchFileUI/bin/
+SearchFileUI/obj/Debug/DesignTimeResolveAssemblyReferences.cache
+SearchFileUI/obj/

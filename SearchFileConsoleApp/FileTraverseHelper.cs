@@ -22,9 +22,9 @@ namespace SearchFileConsoleApp
             .CreateLogger();
         }
 
-        public StringCollection TraverseTree(string root)
+        public List<FileInformation> TraverseTree(string root)
         {
-            StringCollection fileCollection = new StringCollection();
+            List<FileInformation> list = new List<FileInformation>();
             Stack<string> dirs = new Stack<string>(20);
 
             if (!Directory.Exists(root))
@@ -77,7 +77,7 @@ namespace SearchFileConsoleApp
                     try
                     {
                         FileInfo fi = new FileInfo(file);
-                        fileCollection.Add(fi.Name);
+                        list.Add(new FileInformation { Name = fi.Name, Path = fi.FullName });
                     }
                     catch (FileNotFoundException e)
                     {
@@ -97,7 +97,7 @@ namespace SearchFileConsoleApp
                 }
             }
 
-            return fileCollection;
+            return list;
         }
 
         [PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
@@ -111,34 +111,15 @@ namespace SearchFileConsoleApp
             };
 
             // Add event handlers.
-            watcher.Changed += new FileSystemEventHandler(OnChanged);
-            watcher.Created += new FileSystemEventHandler(OnCreated);
-            watcher.Deleted += new FileSystemEventHandler(OnDeleted);
-            watcher.Renamed += new RenamedEventHandler(OnRenamed);
+            watcher.Changed += new FileSystemEventHandler(Program.OnChanged);
+            watcher.Created += new FileSystemEventHandler(Program.OnCreated);
+            watcher.Deleted += new FileSystemEventHandler(Program.OnDeleted);
+            watcher.Renamed += new RenamedEventHandler(Program.OnRenamed);
 
             // Begin watching.
             watcher.EnableRaisingEvents = true;
         }
 
-        // Define the event handlers.
-        private static void OnCreated(object source, FileSystemEventArgs e)
-        {
-            Console.WriteLine("File Created: " + e.FullPath + " " + e.ChangeType);
-        }
-
-        private static void OnChanged(object source, FileSystemEventArgs e)
-        {
-            Console.WriteLine("File Changed: " + e.FullPath + " " + e.ChangeType);
-        }
-
-        private static void OnDeleted(object source, FileSystemEventArgs e)
-        {
-            Console.WriteLine("File Deleted: " + e.FullPath + " " + e.ChangeType);
-        }
-
-        private static void OnRenamed(object source, RenamedEventArgs e)
-        {
-            Console.WriteLine("File: {0} renamed to {1}", e.OldFullPath, e.FullPath);
-        }
+        
     }
 }

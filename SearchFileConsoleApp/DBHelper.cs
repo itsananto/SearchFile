@@ -25,12 +25,11 @@ namespace SearchFileConsoleApp
 
             String tableCommand = "CREATE TABLE IF NOT " +
                 "EXISTS File_Archive (Primary_Key INTEGER PRIMARY KEY, " +
-                "File_Name NVARCHAR(2048) NULL)";
+                "File_Name, Path NVARCHAR(2048) NULL)";
 
             SQLiteCommand createTable = new SQLiteCommand(tableCommand, db);
 
             createTable.ExecuteReader();
-
 
             tableCommand = "CREATE TABLE IF NOT " +
                 "EXISTS Search_History (Primary_Key INTEGER PRIMARY KEY, " +
@@ -42,7 +41,7 @@ namespace SearchFileConsoleApp
             db.Close();
         }
 
-        public void PopulateFileArchiveTable(StringCollection files)
+        public void PopulateFileArchiveTable(List<FileInformation> files)
         {
             db.Open();
 
@@ -54,8 +53,9 @@ namespace SearchFileConsoleApp
 
                 foreach (var file in files)
                 {
-                    insertCommand.CommandText = "INSERT INTO File_Archive VALUES (NULL, @Entry);";
-                    insertCommand.Parameters.AddWithValue("@Entry", file);
+                    insertCommand.CommandText = "INSERT INTO File_Archive VALUES (NULL, @Entry1, @Entry2);";
+                    insertCommand.Parameters.AddWithValue("@Entry1", file.Name);
+                    insertCommand.Parameters.AddWithValue("@Entry2", file.Path);
 
                     insertCommand.ExecuteNonQuery();
                 }
@@ -100,6 +100,23 @@ namespace SearchFileConsoleApp
             db.Close();
 
             return hasRows;
+        }
+
+        public void RenameFile(string oldFile, string newFile, string oldPath, string newPath)
+        {
+            db.Open();
+
+            SQLiteCommand command = new SQLiteCommand();
+            command.Connection = db;
+
+            command.CommandText = "UPDATE FILE_ARCHIVE SET FILE_NAME=@newFile, PATH=@newPath WHERE FILE_NAME=@oldFile AND PATH=@oldPath";
+            command.Parameters.AddWithValue("@newFile", newFile);
+            command.Parameters.AddWithValue("@newPath", newPath);
+            command.Parameters.AddWithValue("@oldFile", oldFile);
+            command.Parameters.AddWithValue("@oldPath", oldPath);
+
+            command.ExecuteNonQuery();
+            db.Close();
         }
     }
 }
